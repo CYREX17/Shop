@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Text;
 using System.Threading;
-using System.Threading.Channels;
+using Shop;
+//using System.Threading.Channels;
 using Shop.Enums;
 
 namespace Shop
 {
-    class Session
+    public class Session
     {
         public int sessionId;
         public SessionStatus SessionStatus { get; private set; } = SessionStatus.active;
@@ -19,9 +20,9 @@ namespace Shop
         {
             Random r = new Random(DateTime.Now.Millisecond);
             sessionId = r.Next(int.MaxValue);
-            
+
         }
-        
+
         //db actions
         private List<Action> actions = new List<Action>
         {
@@ -43,7 +44,7 @@ namespace Shop
         };
 
         //DB of products sample
-        List<Product> productsList = new List<Product>()
+        public List<Product> productsList = new List<Product>()
         {
             new Product("Apple", Product.productCategoryType.Fruit, "Description of Apple", 100m),
             new Product("Plum", Product.productCategoryType.Fruit, "Description of Plum", 200m),
@@ -118,7 +119,7 @@ namespace Shop
                         break;
 
                     case 7:
-                        SeeOrderHistory(); 
+                        SeeOrderHistory();
                         break;
 
                     case 8:
@@ -138,7 +139,7 @@ namespace Shop
                         break;
 
                     case 12:
-                        ProductAdd();
+                        ProductAdd(new ConsoleProvider());
                         break;
 
                     case 13:
@@ -150,9 +151,9 @@ namespace Shop
                         break;
 
                 }
-            
 
-           
+
+
             }
         }
 
@@ -174,7 +175,7 @@ namespace Shop
                     if (user.ifAdmin) ifAdmin = true;
                     break;
                 }
-                
+
             }
 
             if (isAllowed)
@@ -225,7 +226,7 @@ namespace Shop
                 Console.WriteLine();
             }
 
-           
+
         }
 
 
@@ -236,8 +237,8 @@ namespace Shop
 
             for (int i = 0; i < productsList.Count; i++)
             {
-                if (productsList[i].ProductName.ToLower().Contains(searchWord)) 
-                { 
+                if (productsList[i].ProductName.ToLower().Contains(searchWord))
+                {
                     Console.WriteLine("==========================");
                     Console.WriteLine($"Position {i + 1}");
                     Console.WriteLine(">" + productsList[i].ProductName);
@@ -271,7 +272,7 @@ namespace Shop
         {
             List<Product> shoppingList = new List<Product>();
             string str = "tba";
-            while(str.ToLower().Trim() != "exit" || str.ToLower().Trim() != "pay")
+            while (str.ToLower().Trim() != "exit" || str.ToLower().Trim() != "pay")
             {
                 DisplayProducts();
                 if (shoppingList != null)
@@ -319,13 +320,13 @@ namespace Shop
                     break;
                 }
                 bool ifProductExist = false;
-                if (productsList[int.Parse(str)-1] != null)
+                if (productsList[int.Parse(str) - 1] != null)
                 {
                     shoppingList.Add(productsList[int.Parse(str) - 1]);
                     ifProductExist = true;
                 }
-                
-                if(!ifProductExist) Console.WriteLine("Invalid entry or Product is unavailable");
+
+                if (!ifProductExist) Console.WriteLine("Invalid entry or Product is unavailable");
             }
         }
 
@@ -334,7 +335,7 @@ namespace Shop
             if (visitor._visitorType == Visitor.VisitorType.registeredUser)
             {
                 SeeOrderHistory();
-                
+
                 Console.WriteLine("Please enter order number you wish to update:");
                 int orderToUpdate = int.Parse(Console.ReadLine());
                 bool ifExist = false;
@@ -349,7 +350,7 @@ namespace Shop
 
                             Console.Write($"Do you want to change it to 'Cancelled'? Y/N: ");
                             string answer = Console.ReadLine();
-                            user.OrderStatusList[orderToUpdate] = answer?.ToLower() == "y"? OrderStatus.CancelledByUser : OrderStatus.New;
+                            user.OrderStatusList[orderToUpdate] = answer?.ToLower() == "y" ? OrderStatus.CancelledByUser : OrderStatus.New;
 
                             Console.WriteLine($"New status of order {orderToUpdate} is {user.OrderStatusList[orderToUpdate]}");
 
@@ -419,7 +420,7 @@ namespace Shop
                     int orderNum = 0;
                     foreach (var order in user.OrderStatusList)
                     {
-                        Console.WriteLine($">>Order {orderNum+1}<<");
+                        Console.WriteLine($">>Order {orderNum + 1}<<");
                         foreach (var item in user.OrderList[orderNum])
                         {
                             Console.Write($"{item.ProductName}; ");
@@ -434,12 +435,12 @@ namespace Shop
                 }
             }
         }
-        
-        void ProductAdd()
+
+        public void ProductAdd(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("Enter data for new Product");
             Console.Write("Name: ");
-            string name = Console.ReadLine();
+            string name = consoleProvider.ReadLine();
 
 
             int i = 0;
@@ -452,22 +453,22 @@ namespace Shop
             Console.WriteLine();
             Console.Write("Category: ");
 
-            var category = (Product.productCategoryType)int.Parse(Console.ReadLine());
-            
-            Console.Write("Description: ");
-            string description = Console.ReadLine();
-            Console.Write("Price: ");
-            decimal price = decimal.Parse(Console.ReadLine());
-            
+            var category = (Product.productCategoryType)int.Parse(consoleProvider.ReadLineCategory());
 
-            productsList.Add(new Product(name, category, description, price));
+            Console.Write("Description: ");
+            string description = consoleProvider.ReadLine();
+            Console.Write("Price: ");
+            decimal price = decimal.Parse(consoleProvider.ReadLinePrice());
+
+
+            Repository.Add(new Product(name, category, description, price));
         }
 
         void ProductDataChange()
         {
             DisplayProducts();
             Console.WriteLine("Please type Position you wish to update");
-            int positionToChange = int.Parse(Console.ReadLine())-1;
+            int positionToChange = int.Parse(Console.ReadLine()) - 1;
             Console.WriteLine($"It's {productsList[positionToChange].ProductName}");
             Console.Write($"Please type new Name iso {productsList[positionToChange].ProductName}: ");
             string newName = Console.ReadLine();
@@ -507,7 +508,7 @@ namespace Shop
 
             if (ifUpdate)
             {
-                
+
                 string newName = "tba";
                 string newLogin = "tba";
                 string newPassword = "tba";
@@ -611,9 +612,29 @@ namespace Shop
                 }
             }
 
-            if(!ifExist) Console.WriteLine($"User with login '{userLogin}' is not exist");
-            
+            if (!ifExist) Console.WriteLine($"User with login '{userLogin}' is not exist");
+
         }
 
     }
+}
+
+class ConsoleProvider : IConsoleProvider
+{
+    public string ReadLine()
+    {
+        return Console.ReadLine();
+    }
+
+    public string ReadLineCategory()
+    {
+        return Console.ReadLine();
+    }
+
+    public string ReadLinePrice()
+    {
+        return Console.ReadLine();
+    }
+
+
 }

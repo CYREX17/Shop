@@ -1,6 +1,6 @@
 ﻿namespace Shop
 {
-    class Product
+    public class Product
     {
         private string productName;
         private productCategoryType productCategory;
@@ -32,7 +32,7 @@
         }
 
 
-        internal enum productCategoryType
+        public enum productCategoryType
         {
             Fruit,
             Vegetable,
