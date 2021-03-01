@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Shop
 {
-    class Action
+    public class Action
     {
         public string name;
         public Action<IConsoleProvider> action;

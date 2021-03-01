@@ -1,4 +1,5 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Shop.Tests
@@ -10,7 +11,7 @@ namespace Shop.Tests
         public void ProductAdd_AddNewProduct_SaveToProductList()
         {
             //Act
-            Session.ProductAdd(new StubConsoleProvider());
+            Session.ProductAdd(new StubConsoleProvider("Test"));
 
             //Assert
             Assert.IsTrue(Session.productsList.Find(p => p.ProductName == "Test" && p.ProductPrice == 100) != null);
@@ -20,19 +21,41 @@ namespace Shop.Tests
         public void Registration_AddNewUserWithNonEmptyLines_SaveToUserList()
         {
             //Act
-            Session.Registration(new StubConsoleProvider());
+            Session.Registration(new StubConsoleProvider("Test"));
 
             //Assert
             Assert.IsTrue(Session.userList.Find(u => u.userName == "Test") != null);
         }
 
+        [TestMethod]
+        public void Shopping_UserChosePay_SaveNewShoppingListToOrderList()
+        {
+            //Arrange
+            Session session = new Session();
+            Session.visitor = new Visitor() { login = "Kirill", _visitorType = Visitor.VisitorType.administrator, ShoppingList = new List<Product>() };
+
+            //Act
+            Session.Shopping(new StubConsoleProvider("Pay"));
+
+            //Assert
+            Assert.IsTrue(Session.userList.FirstOrDefault(p => p.userName == "Kirill").OrderList.Count == 1);
+        }
+
+
     }
 
     class StubConsoleProvider : IConsoleProvider
     {
+        string value;
+
+        public StubConsoleProvider(string value)
+        {
+            this.value = value;
+        }
+
         public string ReadLine()
         {
-            return "Test";
+            return value;
         }
 
         public string ReadLineCategory()
@@ -46,24 +69,4 @@ namespace Shop.Tests
         }
 
     }
-
-    class StubEmptyLinesConsoleProvider : IConsoleProvider
-    {
-        public string ReadLine()
-        {
-            return "";
-        }
-
-        public string ReadLineCategory()
-        {
-            return "";
-        }
-
-        public string ReadLinePrice()
-        {
-            return "";
-        }
-
-    }
-
 }

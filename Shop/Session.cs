@@ -13,7 +13,7 @@ namespace Shop
     {
         public int sessionId;
         public static SessionStatus SessionStatus { get; private set; } = SessionStatus.active;
-        static Visitor visitor = new Visitor();
+        public static Visitor visitor = new Visitor();
 
 
         public Session()
@@ -279,7 +279,7 @@ namespace Shop
             userList.Add(new User(name, login, password));
         }
 
-        static void Shopping(IConsoleProvider consoleProvider)
+        public static void Shopping(IConsoleProvider consoleProvider)
         {
             List<Product> shoppingList = new List<Product>();
             string str = "tba";
@@ -297,7 +297,7 @@ namespace Shop
 
                 Console.WriteLine();
                 Console.WriteLine("What do you wish to buy? Type product Position # or 'pay' for payment, or 'exit' for exit");
-                str = Console.ReadLine();
+                str = consoleProvider.ReadLine();
 
                 if (str.ToLower().Trim() == "exit")
                 {

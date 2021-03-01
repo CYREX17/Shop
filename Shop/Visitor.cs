@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Shop
 {
-    class Visitor
+    public class Visitor
     {
         public VisitorType _visitorType;
         public List<Product> ShoppingList;
         public string login;
 
-        internal enum VisitorType
+        public enum VisitorType
         {
             guest,
             registeredUser,
@@ -27,14 +27,14 @@ namespace Shop
         {
             switch (_visitorType)
             {
-                
+
             }
             foreach (var item in actions)
             {
-                
+
             }
         }
-       
+
 
         public void LoginAsUser()
         {
