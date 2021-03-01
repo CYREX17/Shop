@@ -3,7 +3,7 @@ using Shop.Enums;
 
 namespace Shop
 {
-    class User
+  public  class User
     {
         public string userName;
         public string userLogin;

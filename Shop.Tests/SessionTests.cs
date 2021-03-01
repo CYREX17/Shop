@@ -9,16 +9,23 @@ namespace Shop.Tests
         [TestMethod]
         public void ProductAdd_AddNewProduct_SaveToProductList()
         {
-            //Arrange
-            Session session = new Session();
-            Product newProduct = new Product("Test", Product.productCategoryType.Alcohol, "Test", 100);
-
             //Act
-            session.ProductAdd(new StubConsoleProvider());
+            Session.ProductAdd(new StubConsoleProvider());
 
             //Assert
-            Assert.IsTrue(Repository.productsList.Find(p => p.ProductName == "Test") != null);
+            Assert.IsTrue(Session.productsList.Find(p => p.ProductName == "Test" && p.ProductPrice == 100) != null);
         }
+
+        [TestMethod]
+        public void Registration_AddNewUserWithNonEmptyLines_SaveToUserList()
+        {
+            //Act
+            Session.Registration(new StubConsoleProvider());
+
+            //Assert
+            Assert.IsTrue(Session.userList.Find(u => u.userName == "Test") != null);
+        }
+
     }
 
     class StubConsoleProvider : IConsoleProvider
@@ -39,4 +46,24 @@ namespace Shop.Tests
         }
 
     }
+
+    class StubEmptyLinesConsoleProvider : IConsoleProvider
+    {
+        public string ReadLine()
+        {
+            return "";
+        }
+
+        public string ReadLineCategory()
+        {
+            return "";
+        }
+
+        public string ReadLinePrice()
+        {
+            return "";
+        }
+
+    }
+
 }

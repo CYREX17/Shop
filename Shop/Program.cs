@@ -8,12 +8,12 @@ namespace Shop
         static void Main(string[] args)
         {
             Session s = new Session();
-            Visitor visitor = new Visitor();
+            //Visitor visitor = new Visitor();
 
-            while (s.SessionStatus == SessionStatus.active)
+            while (Session.SessionStatus == SessionStatus.active)
             {
                 
-                s.DisplayMenuBar();
+                Session.DisplayMenuBar(new ConsoleProvider());
 
                 Console.WriteLine("Please make your choice");
                 int button = int.Parse(Console.ReadLine());

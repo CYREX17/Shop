@@ -12,8 +12,8 @@ namespace Shop
     public class Session
     {
         public int sessionId;
-        public SessionStatus SessionStatus { get; private set; } = SessionStatus.active;
-        Visitor visitor = new Visitor();
+        public static SessionStatus SessionStatus { get; private set; } = SessionStatus.active;
+        static Visitor visitor = new Visitor();
 
 
         public Session()
@@ -24,27 +24,38 @@ namespace Shop
         }
 
         //db actions
-        private List<Action> actions = new List<Action>
+        private static List<Action> actions = new List<Action>
         {
-            new Action("Login", 1, true, "guest"),
-            new Action("Logout", 2, false,"registeredUser", "administrator"),
-            new Action("Show product list", 3, true, "guest", "registeredUser", "administrator"),
-            new Action("Product search", 4, true, "guest", "registeredUser", "administrator"),
-            new Action("Registration", 5, true, "guest"),
-            new Action("New Order", 6, false, "registeredUser", "administrator"),
-            new Action("Order History", 7, false, "registeredUser", "administrator"),
-            new Action("Order status change", 8, false, "registeredUser", "administrator"),
-            new Action("Update Profile", 9, false, "registeredUser", "administrator"),
+            new Action("Login",Login, 1, true, "guest"),
+            new Action("Logout",Logout, 2, false,"registeredUser", "administrator"),
+            new Action("Show product list",DisplayProducts, 3, true, "guest", "registeredUser", "administrator"),
+            new Action("Product search",DisplayProductSearch, 4, true, "guest", "registeredUser", "administrator"),
+            new Action("Registration",Registration, 5, true, "guest"),
+            new Action("New Order",Shopping, 6, false, "registeredUser", "administrator"),
+            new Action("Order History",SeeOrderHistory, 7, false, "registeredUser", "administrator"),
+            new Action("Order status change",OrderStatusUpdate, 8, false, "registeredUser", "administrator"),
+            new Action("Update Profile",UserDataChangeByUser, 9, false, "registeredUser", "administrator"),
             //new Action("Cancel order", 10, false,  "registeredUser", "administrator"),
-            new Action("User profile change", 11, false, "administrator"),
-            new Action("Product add", 12, false, "administrator"),
-            new Action("Product data change", 13, false,  "administrator"),
+            new Action("User profile change",UserDataChangeByAdmin, 11, false, "administrator"),
+            new Action("Product add",ProductAdd, 12, false, "administrator"),
+            new Action("Product data change",ProductDataChange, 13, false,  "administrator"),
             //new Action("Order status change", 14, false,  "administrator"), //
-            new Action("Exit", 15, true, "guest", "registeredUser", "administrator")
+            new Action("Exit",Exit, 15, true, "guest", "registeredUser", "administrator")
         };
 
+        private static void Logout(IConsoleProvider obj)
+        {
+            visitor._visitorType = Visitor.VisitorType.guest;
+            ActionVisibilityChanger.ActionChanger(actions, visitor);
+        }
+
+        private static void Exit(IConsoleProvider consoleProvider)
+        {
+            SessionStatus = SessionStatus.notActive;
+        }
+
         //DB of products sample
-        public List<Product> productsList = new List<Product>()
+        public static List<Product> productsList = new List<Product>()
         {
             new Product("Apple", Product.productCategoryType.Fruit, "Description of Apple", 100m),
             new Product("Plum", Product.productCategoryType.Fruit, "Description of Plum", 200m),
@@ -59,7 +70,7 @@ namespace Shop
         };
 
         //DB of users sample
-        List<User> userList = new List<User>()
+        public static List<User> userList = new List<User>()
         {
             new User("Ivan", "Ivan","Ivan1"),
             new User("Andrii", "Andrii","Andrii1"),
@@ -76,88 +87,88 @@ namespace Shop
             {
                 if (item.button == button && item.ifEnabled)
                 {
-                    ifAvailableChoise = true;
+                    item.action.Invoke(new ConsoleProvider());
                     break;
                 }
             }
 
-            if (!ifAvailableChoise)
-            {
-                Console.WriteLine("You made incorrect choice");
-            }
-            else
-            {
-                switch (button)
-                {
-                    case 15:
-                        SessionStatus = SessionStatus.notActive;
-                        break;
+            //if (!ifAvailableChoise)
+            //{
+            //    Console.WriteLine("You made incorrect choice");
+            //}
+            //else
+            //{
+            //    switch (button)
+            //    {
+            //        case 15:
+            //            SessionStatus = SessionStatus.notActive;
+            //            break;
 
-                    case 1:
-                        Login();
-                        break;
+            //        case 1:
+            //            Login(new ConsoleProvider());
+            //            break;
 
-                    case 2:
-                        visitor._visitorType = Visitor.VisitorType.guest;
-                        ActionVisibilityChanger.ActionChanger(actions, visitor);
-                        break;
+            //        case 2:
+            //            visitor._visitorType = Visitor.VisitorType.guest;
+            //            ActionVisibilityChanger.ActionChanger(actions, visitor);
+            //            break;
 
-                    case 3:
-                        DisplayProducts();
-                        break;
+            //        case 3:
+            //            DisplayProducts(new ConsoleProvider());
+            //            break;
 
-                    case 4:
-                        DisplayProductSearch();
-                        break;
+            //        case 4:
+            //            DisplayProductSearch(new ConsoleProvider());
+            //            break;
 
-                    case 5:
-                        Registration();
-                        break;
+            //        case 5:
+            //            Registration(new ConsoleProvider());
+            //            break;
 
-                    case 6:
-                        Shopping();
-                        break;
+            //        case 6:
+            //            Shopping(new ConsoleProvider());
+            //            break;
 
-                    case 7:
-                        SeeOrderHistory();
-                        break;
+            //        case 7:
+            //            SeeOrderHistory(new ConsoleProvider());
+            //            break;
 
-                    case 8:
-                        OrderStatusUpdate();
-                        break;
+            //        case 8:
+            //            OrderStatusUpdate(new ConsoleProvider());
+            //            break;
 
-                    case 9:
-                        UserDataChangeByUser();
-                        break;
+            //        case 9:
+            //            UserDataChangeByUser(new ConsoleProvider());
+            //            break;
 
-                    //case 10:
-                    //    OrderStatusUpdate();
-                    //    break;
+            //        //case 10:
+            //        //    OrderStatusUpdate();
+            //        //    break;
 
-                    case 11:
-                        UserDataChangeByAdmin();
-                        break;
+            //        case 11:
+            //            UserDataChangeByAdmin(new ConsoleProvider());
+            //            break;
 
-                    case 12:
-                        ProductAdd(new ConsoleProvider());
-                        break;
+            //        case 12:
+            //            ProductAdd(new ConsoleProvider());
+            //            break;
 
-                    case 13:
-                        ProductDataChange();
-                        break;
+            //        case 13:
+            //            ProductDataChange(new ConsoleProvider());
+            //            break;
 
-                    default:
-                        Console.WriteLine("How did you get here?");
-                        break;
+            //        default:
+            //            Console.WriteLine("How did you get here?");
+            //            break;
 
-                }
+            //    }
 
 
 
-            }
+            //}
         }
 
-        public void Login()
+        public static void Login(IConsoleProvider consoleProvider)
         {
             Console.Write("Please enter login:");
             string enteredLogin = Console.ReadLine();
@@ -199,7 +210,7 @@ namespace Shop
         }
 
 
-        public void DisplayMenuBar()
+        public static void DisplayMenuBar(IConsoleProvider consoleProvider)
         {
             foreach (var item in actions)
             {
@@ -211,7 +222,7 @@ namespace Shop
             Console.WriteLine();
         }
 
-        void DisplayProducts()
+        static void DisplayProducts(IConsoleProvider consoleProvider)
         {
             for (int i = 0; i < productsList.Count; i++)
             {
@@ -230,7 +241,7 @@ namespace Shop
         }
 
 
-        void DisplayProductSearch()
+        static void DisplayProductSearch(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("What do you want to find?");
             string searchWord = Console.ReadLine().ToLower();
@@ -252,10 +263,10 @@ namespace Shop
             }
         }
 
-        void Registration()
+        public static void Registration(IConsoleProvider consoleProvider)
         {
             Console.Write("Please enter your name:");
-            string name = Console.ReadLine();
+            string name = consoleProvider.ReadLine();
 
             Console.Write("Please enter your login:");
             string login = Console.ReadLine();
@@ -268,13 +279,13 @@ namespace Shop
             userList.Add(new User(name, login, password));
         }
 
-        void Shopping()
+        static void Shopping(IConsoleProvider consoleProvider)
         {
             List<Product> shoppingList = new List<Product>();
             string str = "tba";
             while (str.ToLower().Trim() != "exit" || str.ToLower().Trim() != "pay")
             {
-                DisplayProducts();
+                DisplayProducts(new ConsoleProvider());
                 if (shoppingList != null)
                 {
                     Console.Write("Your basket: ");
@@ -330,11 +341,11 @@ namespace Shop
             }
         }
 
-        void OrderStatusUpdate()
+        static void OrderStatusUpdate(IConsoleProvider consoleProvider)
         {
             if (visitor._visitorType == Visitor.VisitorType.registeredUser)
             {
-                SeeOrderHistory();
+                SeeOrderHistory(new ConsoleProvider());
 
                 Console.WriteLine("Please enter order number you wish to update:");
                 int orderToUpdate = int.Parse(Console.ReadLine());
@@ -410,7 +421,7 @@ namespace Shop
             }
         }
 
-        void SeeOrderHistory()
+        static void SeeOrderHistory(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("Your orders are:");
             foreach (var user in userList)
@@ -436,7 +447,7 @@ namespace Shop
             }
         }
 
-        public void ProductAdd(IConsoleProvider consoleProvider)
+        public static void ProductAdd(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("Enter data for new Product");
             Console.Write("Name: ");
@@ -461,12 +472,12 @@ namespace Shop
             decimal price = decimal.Parse(consoleProvider.ReadLinePrice());
 
 
-            Repository.Add(new Product(name, category, description, price));
+            productsList.Add(new Product(name, category, description, price));
         }
 
-        void ProductDataChange()
+        static void ProductDataChange(IConsoleProvider consoleProvider)
         {
-            DisplayProducts();
+            DisplayProducts(new ConsoleProvider());
             Console.WriteLine("Please type Position you wish to update");
             int positionToChange = int.Parse(Console.ReadLine()) - 1;
             Console.WriteLine($"It's {productsList[positionToChange].ProductName}");
@@ -500,7 +511,7 @@ namespace Shop
             Console.ReadLine();
         }
 
-        void UserDataChangeByUser()
+        static void UserDataChangeByUser(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("Do you wish to update you profile Y/N? ");
             bool ifUpdate = Console.ReadLine().ToLower() == "y";
@@ -579,7 +590,7 @@ namespace Shop
 
         }
 
-        void UserDataChangeByAdmin()
+        static void UserDataChangeByAdmin(IConsoleProvider consoleProvider)
         {
             Console.WriteLine("Please type 'login' of user you wish to update");
             string userLogin = Console.ReadLine();
